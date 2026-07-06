@@ -1,0 +1,68 @@
+version: '3.8'
+
+services:
+  # MongoDB database for storing audit trails and analyses
+  mongodb:
+    image: mongo:6.0
+    container_name: vendor_mongodb
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    networks:
+      - vendor_network
+
+  # ChromaDB Vector Database for proposal embeddings
+  chromadb:
+    image: chromadb/chroma:0.4.15
+    container_name: vendor_chromadb
+    ports:
+      - "8000:8000"
+    volumes:
+      - chroma_data:/chroma/chroma
+    networks:
+      - vendor_network
+
+  # Spring Boot Java Backend service
+  backend:
+    build:
+      context: ./spring-boot-backend
+      dockerfile: Dockerfile
+    container_name: vendor_backend
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_DATA_MONGODB_URI=mongodb://mongodb:27017/vendor_analysis
+      - CHROMADB_URL=http://chromadb:8000
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - JWT_SECRET=ai-vendor-analysis-secret-key-12345
+      - SPRING_MAIL_HOST=smtp.gmail.com
+      - SPRING_MAIL_PORT=587
+      - SPRING_MAIL_USERNAME=${EMAIL_USER}
+      - SPRING_MAIL_PASSWORD=${EMAIL_PASS}
+    depends_on:
+      - mongodb
+      - chromadb
+    networks:
+      - vendor_network
+
+  # React Frontend client
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: vendor_frontend
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    networks:
+      - vendor_network
+
+volumes:
+  mongo_data:
+  chroma_data:
+
+networks:
+  vendor_network:
+    driver: bridge

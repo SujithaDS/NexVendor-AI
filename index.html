@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>NexVendor AI - Intelligent Vendor Evaluation</title>
+    <script>
+      // Disable Vite client-side HMR WebSocket connection to prevent connection failure logs in preview
+      (function() {
+        const OriginalWebSocket = window.WebSocket;
+        if (OriginalWebSocket) {
+          window.WebSocket = function(url, protocols) {
+            const urlStr = String(url);
+            if (urlStr.includes('/vite') || urlStr.includes('vite-hmr') || urlStr.includes('ws://' + window.location.host) || urlStr.includes('wss://' + window.location.host)) {
+              // Create a dummy WebSocket-like object that behaves as a closed connection
+              return {
+                url: urlStr,
+                readyState: 3, // CLOSED
+                bufferedAmount: 0,
+                extensions: '',
+                protocol: '',
+                binaryType: 'blob',
+                addEventListener: function(type, listener, options) {},
+                removeEventListener: function(type, listener, options) {},
+                dispatchEvent: function(event) { return true; },
+                send: function(data) {},
+                close: function(code, reason) {},
+                onopen: null,
+                onerror: null,
+                onclose: null,
+                onmessage: null
+              };
+            }
+            return new OriginalWebSocket(url, protocols);
+          };
+          window.WebSocket.prototype = OriginalWebSocket.prototype;
+          Object.assign(window.WebSocket, OriginalWebSocket);
+        }
+      })();
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
+

@@ -1,0 +1,6 @@
+{
+  "name": "NexVendor AI",
+  "description": "Analyze vendor proposals using Artificial Intelligence and choose the best vendor based on quality, price, delivery, experience, compliance, and business requirements.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
